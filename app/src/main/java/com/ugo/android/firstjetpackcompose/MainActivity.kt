@@ -4,10 +4,11 @@ import android.inputmethodservice.Keyboard
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -22,6 +23,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,63 +34,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val painter = painterResource(id = R.drawable.cute_boy_two)
-            val description = "Image of a cute little boy"
-            val title = "Jayden is looking fly!"
-            Box(modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(16.dp)) {
-                ImageCard(painter = painter,
-                    contentDescription = description,
-                    title = title)
-            }
-        }
-    }
-}
-
-@Composable
-fun ImageCard(
-    painter: Painter,
-    contentDescription: String,
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Card(modifier = Modifier
-        .fillMaxWidth(),
-         shape = RoundedCornerShape(15.dp),
-         elevation = 15.dp) {
-        Box(modifier = Modifier
-            .height(200.dp)) {
-            Image(painter = painter, 
-                contentDescription = contentDescription, 
-                contentScale = ContentScale.Crop
-            )
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black
-                        ),
-                        startY = 200f
+            LazyColumn{
+                itemsIndexed(
+                    listOf("zero","one","two","three","four","five","six","seven","eight","nine","ten")
+                ){index, string ->
+                    Text(
+                        text = "$index: $string",
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
                     )
-                )) {
-                
+                }
             }
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Text(text = title, style = TextStyle(color = Color.White, fontSize = 16.sp))
-            }
-            
+
         }
-
     }
-
 }
+
 
 
 
