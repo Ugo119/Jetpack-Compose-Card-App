@@ -20,74 +20,58 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
+
 import com.ugo.android.firstjetpackcompose.ui.theme.FirstJetpackComposeTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val painter = painterResource(id = R.drawable.cute_boy_two)
-            val description = "Image of a cute little boy"
-            val title = "Jayden is looking fly!"
-            Box(modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(16.dp)) {
-                ImageCard(painter = painter,
-                    contentDescription = description,
-                    title = title)
+            //Every implementation of ConstraintLayout requires a ConstraintSet.
+            val constraints = ConstraintSet {
+                val greenBox = createRefFor("greenBox")
+                val redBox = createRefFor("redBox")
+
+                constrain(greenBox){
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    width = Dimension.value(150.dp)
+                    height = Dimension.value(150.dp)
+                }
+                constrain(redBox){
+                    top.linkTo(parent.top)
+                    start.linkTo(greenBox.end)
+                    end.linkTo(parent.end)
+                    width = Dimension.value(150.dp)
+                    height = Dimension.value(150.dp)
+                }
+                createHorizontalChain(greenBox, redBox, chainStyle = ChainStyle.Spread)
+            }
+
+            ConstraintLayout(constraints, modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp)) {
+                Box(modifier = Modifier
+                    .background(color = Color.Green)
+                    .layoutId("greenBox"))
+                Box(modifier = Modifier
+                    .background(color = Color.Red)
+                    .layoutId("redBox"))
             }
         }
     }
 }
 
-@Composable
-fun ImageCard(
-    painter: Painter,
-    contentDescription: String,
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Card(modifier = Modifier
-        .fillMaxWidth(),
-         shape = RoundedCornerShape(15.dp),
-         elevation = 15.dp) {
-        Box(modifier = Modifier
-            .height(200.dp)) {
-            Image(painter = painter, 
-                contentDescription = contentDescription, 
-                contentScale = ContentScale.Crop
-            )
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black
-                        ),
-                        startY = 200f
-                    )
-                )) {
-                
-            }
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Text(text = title, style = TextStyle(color = Color.White, fontSize = 16.sp))
-            }
-            
-        }
-
-    }
-
-}
 
 
 
