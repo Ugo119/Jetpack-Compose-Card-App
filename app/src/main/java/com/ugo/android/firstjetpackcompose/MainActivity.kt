@@ -12,10 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -37,39 +34,89 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CounterComposable()
+            //CounterComposable()
+            ButtonPress()
         }
     }
 }
 
+//When you need to run a suspend function within the scope of a composable function, you use
+//LaunchedEffect, which is a composable function. When the LaunchedEffect is in composition,
+//it launches a coroutine and the coroutine is cancelled when the LaunchedEffect leaves the
+//composition.
 @Composable
 fun CounterComposable() {
     val scaffoldState = rememberScaffoldState()
-    var counter = remember {
-        0
+    var counter by remember{
+        mutableStateOf(0)
     }
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier
         .fillMaxSize(),
         scaffoldState = scaffoldState) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()) {
+            Button(onClick = {
+                counter++
+                Log.e(TAG, "CounterComposable: $counter")
+            }) {
+                Text(text = "Click me! $counter")
+            }
 
-        Button(onClick = {
-            counter++
-            Log.e(TAG, "CounterComposable: $counter")
-        }) {
-            Text(text = "Click me! $counter")
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(onClick = {
+                if (counter > 0) {
+                    counter--
+                }
+
+                Log.e(TAG, "CounterComposable: $counter")
+            }) {
+                Text(text = "Click me! $counter")
+            }
         }
+
         if (counter > 0 && counter % 5 == 0) {
+            Log.e(TAG, "CounterComposable_CounterINSIDE:  $counter")
             LaunchedEffect(scaffoldState.snackbarHostState){
                 scaffoldState.snackbarHostState.showSnackbar("Item $counter")
             }
         }
-
     }
-
 }
+
+//When you need to obtain a composition-aware scope to launch a coroutine outside a composable,
+// you can use rememberScaffoldState. rememberCoroutineScope is a composable function that
+// returns a CoroutineScope bound to the point of the Composition where it's called.
+// The scope will be cancelled when the call leaves the Composition.
+@Composable
+fun ButtonPress() {
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    var name = "Ugochukwu"
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Button(onClick = {
+            scope.launch {
+                scaffoldState.snackbarHostState.showSnackbar("Hello $name")
+            }
+        }) {
+
+        }
+    }
+}
+
+//rememberUpdatedState: reference a value in an effect that shouldn't restart if the value changes
+//LaunchedEffect restarts when one of the key parameters changes. However, in some situations you
+// might want to capture a value in your effect that, if it changes, you do not want the effect
+// to restart. In order to do this, it is required to use rememberUpdatedState to create a reference
+// to this value which can be captured and updated.
 
 
 
